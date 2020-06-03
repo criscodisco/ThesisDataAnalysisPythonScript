@@ -1,0 +1,810 @@
+import openpyxl
+from openpyxl import Workbook
+
+filename_destination = (r"D:\Documents\KyleThesisExperimentDataandProgramforDr_Reimer\KyleThesisExperimentDataandProgramforDr_Reimer/eyegazedata.xlsx")
+
+# Create Instance of Workbook Class and activate sheet on destination Excel file
+wb2 = Workbook()
+wb2 = openpyxl.load_workbook(filename_destination)
+ws2 = wb2.worksheets[0]
+ws2 = wb2.active
+
+#Create array of Column Labels for Destination file and output to it
+excelOutputLabels = ['1.5 second delay', 'Participant Number',  'AX Trial Cue Gaze TVD (sec)', 'AX Trial Probe Gaze TVD (sec)', 'AX Trial Non-Probe Gaze TVD (sec)', 'AY Trial Cue Gaze TVD (sec)', 'AY Trial Probe Gaze TVD (sec)', 
+                     'AY Trial Non-Probe Gaze TVD (sec)', 'BX Trial Cue Gaze TVD (sec)', 'BX Trial Probe Gaze TVD (sec)', 
+                      'BX Trial Non-Probe Gaze TVD (sec)', 'BY Trial Cue Gaze TVD (sec)', 'BY Trial Probe Gaze TVD (sec)', 
+                      'BY Trial Non-Probe Gaze TVD (sec)', '3 second delay', 'Participant Number', 
+                      'AX Trial Cue Gaze TVD (sec)', 'AX Trial Probe Gaze TVD (sec)', 
+                      'AX Trial Non-Probe Gaze TVD (sec)', 'AY Trial Cue Gaze TVD (sec)', 'AY Trial Probe Gaze TVD (sec)', 
+                      'AY Trial Non-Probe Gaze TVD (sec)', 'BX Trial Cue Gaze TVD (sec)', 'BX Trial Probe Gaze TVD (sec)', 'BX Trial Non-Probe Gaze TVD (sec)', 'BY Trial Cue Gaze TVD (sec)', 'BY Trial Probe Gaze TVD (sec)', 'BY Trial Non-Probe Gaze TVD (sec)',
+                      '1.5 second delay', 'Participant Number','AX Trial Cue Gaze Average','AX Trial Probe Gaze Average', 'AX Trial Non-Probe Gaze Average','AY Trial Cue Gaze Average','AY Trial Probe Gaze Average','AY Trial Non-Probe Gaze Average', 'BX Trial Cue Gaze Average','BX Trial Probe Gaze Average', 
+                     'BX Trial Non-Probe Gaze Average', 'BY Trial Cue Gaze Average','BY Trial Probe Gaze Average', 
+                     'BY Trial Non-Probe Gaze Average',
+                     '3 second delay', 'Participant Number','AX Trial Cue Gaze Average','AX Trial Probe Gaze Average', 'AX Trial Non-Probe Gaze Average', 'AY Trial Cue Gaze Average','AY Trial Probe Gaze Average','AY Trial Non-Probe Gaze Average', 'BX Trial Cue Gaze Average','BX Trial Probe Gaze Average', 
+                     'BX Trial Non-Probe Gaze Average', 'BY Trial Cue Gaze Average','BY Trial Probe Gaze Average', 
+                     'BY Trial Non-Probe Gaze Average', '1.5 second delay', 'Participant Number', 'ISI Total AX', 'ISI Total AY', 'ISI Total BX', 'ISI Total BY', 
+                     '3 second delay', 'Participant Number', 'ISI Total AX', 'ISI Total AY', 'ISI Total BX', 'ISI Total BY', '1.5 second delay', '# of No Data Rows', '3 second delay', '# of No Data Rows']
+
+
+
+# writing Labels to output file
+for a in range(len(excelOutputLabels)):
+    ws2.cell(row = 1, column = a+1).value = excelOutputLabels[a]
+
+# 1.5 second delay participant array
+participantNumberArray = [302, 304, 306, 310, 312, 318, 320, 322, 324, 326, 330, 332, 334, 336, 338, 342, 344, 346, 348, 350, 352, 354, 356, 360, 362, 364, 366, 368, 370, 372, 374, 378, 380, 382, 386]
+
+# Create global variables
+current_Avg_AX_Gaze_ISI_A_Ratio = 0
+current_Avg_AX_Gaze_ISI_X_Ratio = 0
+current_Avg_AX_Gaze_ISI_Non_X_Ratio = 0
+current_Avg_AY_Gaze_ISI_A_Ratio = 0
+current_Avg_AY_Gaze_ISI_Y_Ratio = 0
+current_Avg_AY_Gaze_ISI_Non_Y_Ratio = 0
+current_Avg_BX_Gaze_ISI_B_Ratio = 0
+current_Avg_BX_Gaze_ISI_X_Ratio = 0
+current_Avg_BX_Gaze_ISI_Non_X_Ratio = 0
+current_Avg_BY_Gaze_ISI_B_Ratio = 0
+current_Avg_BY_Gaze_ISI_Y_Ratio = 0
+current_Avg_BY_Gaze_ISI_Non_Y_Ratio = 0
+
+Avg_AX_A_Time = 0
+Avg_AX_X_Time = 0
+Avg_AX_Non_X_Time = 0
+Avg_BX_B_Time = 0
+Avg_BX_X_Time = 0
+Avg_BX_Non_X_Time = 0
+Avg_AY_A_Time = 0
+Avg_AY_Y_Time = 0
+Avg_AY_Non_Y_Time = 0
+Avg_BY_B_Time = 0
+Avg_BY_Y_Time = 0
+Avg_BY_Non_Y_Time = 0
+
+ISI_AX_Non_X = 0
+ISI_BX_Non_X = 0
+ISI_AY_Non_Y = 0
+ISI_BY_Non_Y = 0
+numWrong = 0
+
+ISI_total_AX_Time = 0
+ISI_total_AY_Time = 0
+ISI_total_BX_Time = 0
+ISI_total_BY_Time = 0
+noRecordedDataRow = 0
+
+# Concatenations done at beginning and end of source file name (Participant number is in the middle)
+filenamePart3 = '-1.gazedata.xlsx'
+filename_copy = 'D:\Documents\KyleThesisExperimentDataandProgramforDr_Reimer\KyleThesisExperimentDataandProgramforDr_Reimer\\eyegazedataCopy.xlsx'
+filenamepart1_5 = 'D:\Documents\KyleThesisExperimentDataandProgramforDr_Reimer\KyleThesisExperimentDataandProgramforDr_Reimer\\AX-CPT-40 1.5 s delay Eye Tracker Experiment 3 all Bs-'
+filenamepart3_0 = 'D:\Documents\KyleThesisExperimentDataandProgramforDr_Reimer\KyleThesisExperimentDataandProgramforDr_Reimer\\AX-CPT-40 3 s delay Eye Tracker Experiment 3 all Bs-'
+
+# loop through each file in 1.5 second delay condition
+for i in range (len(participantNumberArray)):
+        
+    #Create variables and arrays
+    participant = 0
+    stringParticipantNumber = ""
+    mr = 0
+    mc = 0
+    mr_copy = 0
+    mr_copy = 0
+    noRecordedDataRow = 0
+    
+    ISI_AX_Non_X = 0
+    ISI_BX_Non_X = 0
+    ISI_AY_Non_Y = 0
+    ISI_BY_Non_Y = 0
+
+    # AX Trials
+    ISI_total_AX = 0
+    ISI_AX_A = 0
+    ISI_AX_X = 0
+    ISI_AX_Non_X = 0
+      
+    # AY Trials
+    ISI_total_AY = 0
+    ISI_AY_A = 0
+    ISI_AY_Y = 0
+    ISI_AY_Non_Y = 0
+
+    # BX Trials
+    ISI_total_BX = 0
+    ISI_BX_B = 0
+    ISI_BX_X = 0
+    ISI_BX_Non_X = 0
+
+    # BY Trials
+    ISI_total_BY = 0   
+    ISI_BY_B = 0
+    ISI_BY_Y = 0
+    ISI_BY_Non_Y = 0
+    
+    current_Avg_AX_Gaze_ISI_A_Ratio = 0
+    current_Avg_AX_Gaze_ISI_X_Ratio = 0
+    current_Avg_AX_Gaze_ISI_Non_X_Ratio = 0
+    current_Avg_AY_Gaze_ISI_A_Ratio = 0
+    current_Avg_AY_Gaze_ISI_Y_Ratio = 0
+    current_Avg_AY_Gaze_ISI_Non_Y_Ratio = 0
+    current_Avg_BX_Gaze_ISI_B_Ratio = 0
+    current_Avg_BX_Gaze_ISI_X_Ratio = 0
+    current_Avg_BX_Gaze_ISI_Non_X_Ratio = 0
+    current_Avg_BY_Gaze_ISI_B_Ratio = 0
+    current_Avg_BY_Gaze_ISI_Y_Ratio = 0
+    current_Avg_BY_Gaze_ISI_Non_Y_Ratio = 0
+
+    Avg_AX_A_Time = 0
+    Avg_AX_X_Time = 0
+    Avg_AX_Non_X_Time = 0
+    Avg_BX_B_Time = 0
+    Avg_BX_X_Time = 0
+    Avg_BX_Non_X_Time = 0
+    Avg_AY_A_Time = 0
+    Avg_AY_Y_Time = 0
+    Avg_AY_Non_Y_Time = 0
+    Avg_BY_B_Time = 0
+    Avg_BY_Y_Time = 0
+    Avg_BY_Non_Y_Time = 0
+    
+    ISI_total_AX_Time = 0
+    ISI_total_AY_Time = 0
+    ISI_total_BX_Time = 0
+    ISI_total_BY_Time = 0
+    
+    # Create string participant number from Participant Number Array and concatenate into source filename
+    participant = participantNumberArray[i]
+    stringParticipantNumber = str(participant)
+    filename_source1_5 = (filenamepart1_5 + stringParticipantNumber + filenamePart3)
+    # Create Instance of Workbook Class and activate sheet on source Excel file
+    wb1 = Workbook()
+    wb1 = openpyxl.load_workbook(filename_source1_5)
+    ws1 = wb1.worksheets[0]
+    ws1 = wb1.active
+    print(filename_source1_5)
+       
+    wbcopy = Workbook()
+    wbcopy = openpyxl.load_workbook(filename_copy)
+    wscopy = wbcopy.worksheets[0]
+    wscopy = wbcopy.active
+    
+    mr = ws1.max_row
+    mc = ws1.max_column
+    
+    # Create variables to identify relevant columns to calculate Cue to Probe ratio analysis
+    columnLeftGazeValidity = 14
+    columnRightGazeValidity = 17
+    columnTrialID = 40
+    columnCue = 41
+    columnTopRightProbeID = 42
+    columnBottomRightProbeID = 43
+    columnAOINumber = 45
+    columnObjectGaze = 46
+    columnAccuracy = 49
+    columnCurrentObject = 52
+      
+    for b in range (1, mr + 1):
+        wscopy.cell(row = b, column = 1).value = ws1.cell(row = b, column = columnTrialID).value       
+        wscopy.cell(row = b, column = 2).value = ws1.cell(row = b, column = columnCue).value
+        wscopy.cell(row = b, column = 3).value = ws1.cell(row = b, column = columnTopRightProbeID).value
+        wscopy.cell(row = b, column = 4).value = ws1.cell(row = b, column = columnBottomRightProbeID).value
+        wscopy.cell(row = b, column = 5).value = ws1.cell(row = b, column = columnAOINumber).value
+        wscopy.cell(row = b, column = 6).value = ws1.cell(row = b, column = columnObjectGaze).value
+        wscopy.cell(row = b, column = 7).value = ws1.cell(row = b, column = columnCurrentObject).value
+        wscopy.cell(row = b, column = 8).value = ws1.cell(row = b, column = columnAccuracy).value
+        wscopy.cell(row = b, column = 9).value = ws1.cell(row = b, column = columnLeftGazeValidity).value
+        wscopy.cell(row = b, column = 10).value = ws1.cell(row = b, column = columnRightGazeValidity).value
+    newColumnTrialID = 1
+    newColumnCue = 2
+    newColumnTopRightProbeID = 3
+    newColumnBottomRightProbeID = 4
+    newColumnAOINumber = 5
+    newColumnObjectGaze = 6
+    newColumnCurrentObject = 7
+    newColumnAccuracy = 8
+    newColumnLeftGazeValidity = 9
+    newColumnRightGazeValidity = 10
+    
+    mr_copy = wscopy.max_row
+    mc_copy = wscopy.max_column
+    count = 0
+    rowPracticeEndNum = 0
+    numWrong = 0
+             
+     # Iterate through all rows of relevant columns
+    for g in range (1, mr+1):
+        count = count + 1
+        if wscopy.cell(row = g, column = newColumnTrialID).value == 10 and wscopy.cell(row = g, column = newColumnCurrentObject).value == "FeedbackDisplay1":
+            rowPracticeEndNum = count
+            break        
+    print("Practice Trial Row Number End: " + str(rowPracticeEndNum))
+
+    for p in range (rowPracticeEndNum, mr + 1):
+        previousTrial = wscopy.cell(row = (p - 1), column = newColumnTrialID).value
+        thisTrial = wscopy.cell(row = p, column = newColumnTrialID).value
+        wrongAnswerCell = wscopy.cell(row = p, column = newColumnAccuracy).value 
+        ISIColumn = wscopy.cell(row = p, column = newColumnCurrentObject).value
+        objectGaze = wscopy.cell(row = p, column = newColumnObjectGaze).value
+        topRightProbeID = wscopy.cell(row = p, column = newColumnTopRightProbeID).value
+        cueColumn = wscopy.cell(row = p, column = newColumnCue).value
+        aoiNumber = wscopy.cell(row = p, column = newColumnAOINumber).value
+        bottomRightProbeID = wscopy.cell(row = p, column = newColumnBottomRightProbeID).value
+        leftGazeColumn = wscopy.cell(row = p, column = newColumnLeftGazeValidity).value
+        rightGazeColumn = wscopy.cell(row = p, column = newColumnRightGazeValidity).value
+   
+        if (leftGazeColumn != 0 or rightGazeColumn != 0):
+            if (ISIColumn == "ISI"):
+                if (wrongAnswerCell == 1):
+               
+                    # Tally AX Trial ISI gaze on A cue data points for each participant
+                    if objectGaze == "A" and  topRightProbeID == "X":
+                        ISI_AX_A += 1 
+                    # Tally AX ISI gaze on X probe data points for each participant    
+                    if  objectGaze == "X" and  topRightProbeID == "X":
+                        ISI_AX_X += 1
+                    # Tally AX ISI gaze on Non X probe data points for each participant    
+                    if  cueColumn == "A" and  topRightProbeID == "X" and objectGaze is None and aoiNumber is not None:
+                        ISI_AX_Non_X += 1
+                    # Tally AY Trial ISI gaze on A cue data points for each participant
+                    if  objectGaze == "A" and objectGaze is not None and  topRightProbeID is not "X" and  topRightProbeID is not None:
+                        ISI_AY_A += 1 
+                    # Tally AY ISI gaze on Y probe data points for each participant
+                    if  cueColumn == "A" and  topRightProbeID is not "X" and  topRightProbeID is not None and aoiNumber == 1:
+                        ISI_AY_Y += 1 
+                    # Tally AY ISI gaze on Non Y probe data points for each participant    
+                    if  cueColumn == "A" and  topRightProbeID is not "X" and objectGaze is None and aoiNumber is not None:
+                        ISI_AY_Non_Y += 1
+                    # Tally BX Trial ISI gaze on B cue data points for each participant
+                    if  objectGaze != "A" and objectGaze is not None and objectGaze == "B" and bottomRightProbeID == "X" and bottomRightProbeID is not None:
+                        ISI_BX_B += 1 
+                    # Tally BX ISI gaze on X probe data points for each participant    
+                    if  objectGaze == "X" and objectGaze is not None and bottomRightProbeID == "X" and bottomRightProbeID is not None:
+                        ISI_BX_X += 1
+                    # Tally BX ISI gaze on Non X probe data points for each participant    
+                    if  cueColumn is not "A" and bottomRightProbeID == "X" and objectGaze is None and aoiNumber is not None:
+                        ISI_BX_Non_X += 1
+                    # Tally BY Trial ISI gaze on B cue data points for each participant
+                    if  objectGaze == "B" and objectGaze is not None and bottomRightProbeID != "X" and bottomRightProbeID is not None:
+                        ISI_BY_B += 1 
+                    # Tally BY ISI gaze on Y probe data points for each participant    
+                    if  bottomRightProbeID != "X" and aoiNumber == 2:
+                        ISI_BY_Y += 1          
+                    # Tally BY ISI gaze on Non Y probe data points for each participant    
+                    if  cueColumn is not "A" and bottomRightProbeID is not "X" and objectGaze is None and aoiNumber is not None:
+                        ISI_BY_Non_Y += 1
+                    # Tally AX total ISI data points for each participant   
+                    if   topRightProbeID == "X" and cueColumn == "A":
+                        ISI_total_AX += 1
+                    # Tally AY total ISI data points for each participant   
+                    if   topRightProbeID != "X" and cueColumn == "A":
+                        ISI_total_AY += 1
+                    # Tally BX total ISI data points for each participant   
+                    if  bottomRightProbeID == "X" and cueColumn != "A":
+                        ISI_total_BX += 1
+                    # Tally BY total ISI data points for each participant   
+                    if  bottomRightProbeID != "X" and cueColumn != "A":
+                        ISI_total_BY += 1
+                elif (wrongAnswerCell == 0):
+                    if (thisTrial == previousTrial):
+                        continue
+        elif (leftGazeColumn == 0 and rightGazeColumn == 0):
+            noRecordedDataRow += 1
+                           
+    # perform average calculations by ratio of A cue or X probe gaze to total AX ISI data points    
+    if ISI_total_AX != 0:
+        current_Avg_AX_Gaze_ISI_A_Ratio = ISI_AX_A / ISI_total_AX
+        current_Avg_AX_Gaze_ISI_X_Ratio = ISI_AX_X / ISI_total_AX
+        current_Avg_AX_Gaze_ISI_Non_X_Ratio = ISI_AX_Non_X / ISI_total_AX
+        if ISI_AX_A != 0:
+            Avg_AX_A_Time = (ISI_AX_A -1)* 16.65496782 /1000
+        else:
+            Avg_AX_A_Time = 0
+        if ISI_AX_X != 0:
+            Avg_AX_X_Time = (ISI_AX_X -1)* 16.65496782 /1000
+        else:
+            Avg_AX_X_Time = 0
+        if ISI_AX_Non_X != 0:
+            Avg_AX_Non_X_Time = (ISI_AX_Non_X -1)* 16.65496782 /1000
+        else:
+            Avg_AX_Non_X_Time = 0
+        ISI_total_AX_Time = ISI_total_AX * 16.65496782 /1000
+    # perform average calculations by ratio of A cue or Y probe gaze to total ISI data points and write values to destination file    
+    if ISI_total_AY != 0:
+        current_Avg_AY_Gaze_ISI_A_Ratio = ISI_AY_A / ISI_total_AY
+        current_Avg_AY_Gaze_ISI_Y_Ratio = ISI_AY_Y / ISI_total_AY
+        current_Avg_AY_Gaze_ISI_Non_Y_Ratio = ISI_AY_Non_Y / ISI_total_AY 
+        if ISI_AY_A != 0:
+            Avg_AY_A_Time = (ISI_AY_A -1)* 16.65496782 /1000
+        else:
+            Avg_AY_A_Time = 0
+        if ISI_AY_Y != 0:
+            Avg_AY_Y_Time = (ISI_AY_Y -1)* 16.65496782 /1000
+        else:
+            Avg_AY_Y_Time = 0
+        if ISI_AY_Non_Y != 0:
+            Avg_AY_Non_Y_Time = (ISI_AY_Non_Y -1)* 16.65496782 /1000
+        else:
+            Avg_AY_Non_Y_Time = 0
+        ISI_total_AY_Time = ISI_total_AY * 16.65496782 /1000    
+    # perform average calculations by ratio of B cue or X probe gaze to total BY ISI data points    
+    if ISI_total_BX != 0:
+        current_Avg_BX_Gaze_ISI_B_Ratio = ISI_BX_B / ISI_total_BX
+        current_Avg_BX_Gaze_ISI_X_Ratio = ISI_BX_X / ISI_total_BX
+        current_Avg_BX_Gaze_ISI_Non_X_Ratio = ISI_BX_Non_X / ISI_total_BX
+        if ISI_BX_B != 0:
+            Avg_BX_B_Time = (ISI_BX_B -1)* 16.65496782 /1000
+        else:
+            Avg_BX_B_Time = 0
+        if ISI_BX_X != 0:
+            Avg_BX_X_Time = (ISI_BX_X -1)* 16.65496782 /1000
+        else:
+            Avg_BX_X_Time = 0
+        if ISI_BX_Non_X != 0:
+            Avg_BX_Non_X_Time = (ISI_BX_Non_X -1)* 16.65496782 /1000
+        else:
+            Avg_BX_Non_X_Time = 0
+        ISI_total_BX_Time = ISI_total_BX * 16.65496782 /1000    
+    # perform average calculations by ratio of B cue or Y probe gaze to total BY ISI data points    
+    if ISI_total_BY != 0:
+        current_Avg_BY_Gaze_ISI_B_Ratio = ISI_BY_B / ISI_total_BY
+        current_Avg_BY_Gaze_ISI_Y_Ratio = ISI_BY_Y / ISI_total_BY
+        current_Avg_BY_Gaze_ISI_Non_Y_Ratio = ISI_BY_Non_Y / ISI_total_BY
+        if ISI_BY_B != 0:
+            Avg_BY_B_Time = (ISI_BY_B -1)* 16.65496782 /1000
+        else:
+            Avg_BY_B_Time = 0
+        if ISI_BY_Y != 0:
+            Avg_BY_Y_Time = (ISI_BY_Y -1)* 16.65496782 /1000
+        else:
+            Avg_BY_Y_Time = 0
+        if ISI_BY_Non_Y != 0:
+            Avg_BY_Non_Y_Time = (ISI_BY_Non_Y -1)* 16.65496782 /1000
+        else:
+            Avg_BY_Non_Y_Time = 0
+        ISI_total_BY_Time = ISI_total_BY * 16.65496782 /1000
+        
+        
+    # writing the participant number to destination excel file
+    ws2.cell(row = (i+2), column = 2).value = stringParticipantNumber
+    ws2.cell(row = (i+2), column = 30).value = stringParticipantNumber
+    ws2.cell(row = (i+2), column = 58).value = stringParticipantNumber
+    
+    # writing each Trial Gaze Average to destination excel file
+    ws2.cell(row = i+2, column = 31).value = current_Avg_AX_Gaze_ISI_A_Ratio
+    ws2.cell(row = i+2, column = 3).value = Avg_AX_A_Time 
+    ws2.cell(row = i+2, column = 32).value = current_Avg_AX_Gaze_ISI_X_Ratio
+    ws2.cell(row = i+2, column = 4).value = Avg_AX_X_Time
+    ws2.cell(row = i+2, column = 33).value = current_Avg_AX_Gaze_ISI_Non_X_Ratio
+    ws2.cell(row = i+2, column = 5).value = Avg_AX_Non_X_Time
+    ws2.cell(row = i+2, column = 34).value = current_Avg_AY_Gaze_ISI_A_Ratio
+    ws2.cell(row = i+2, column = 6).value = Avg_AY_A_Time
+    ws2.cell(row = i+2, column = 35).value = current_Avg_AY_Gaze_ISI_Y_Ratio
+    ws2.cell(row = i+2, column = 7).value = Avg_AY_Y_Time
+    ws2.cell(row = i+2, column = 36).value = current_Avg_AY_Gaze_ISI_Non_Y_Ratio
+    ws2.cell(row = i+2, column = 8).value = Avg_AY_Non_Y_Time
+    ws2.cell(row = i+2, column = 37).value = current_Avg_BX_Gaze_ISI_B_Ratio
+    ws2.cell(row = i+2, column = 9).value = Avg_BX_B_Time
+    ws2.cell(row = i+2, column = 38).value = current_Avg_BX_Gaze_ISI_X_Ratio
+    ws2.cell(row = i+2, column = 10).value = Avg_BX_X_Time
+    ws2.cell(row = i+2, column = 39).value = current_Avg_BX_Gaze_ISI_Non_X_Ratio
+    ws2.cell(row = i+2, column = 11).value = Avg_BX_Non_X_Time
+    ws2.cell(row = i+2, column = 40).value = current_Avg_BY_Gaze_ISI_B_Ratio
+    ws2.cell(row = i+2, column = 12).value = Avg_BY_B_Time
+    ws2.cell(row = i+2, column = 41).value = current_Avg_BY_Gaze_ISI_Y_Ratio
+    ws2.cell(row = i+2, column = 13).value = Avg_BY_Y_Time
+    ws2.cell(row = i+2, column = 42).value = current_Avg_BY_Gaze_ISI_Non_Y_Ratio
+    ws2.cell(row = i+2, column = 14).value = Avg_BY_Non_Y_Time
+    
+    ws2.cell(row = i+2, column = 59).value = ISI_total_AX_Time
+    ws2.cell(row = i+2, column = 60).value = ISI_total_AY_Time
+    ws2.cell(row = i+2, column = 61).value = ISI_total_BX_Time
+    ws2.cell(row = i+2, column = 62).value = ISI_total_BY_Time
+    
+    ws2.cell(row = i+2, column = 70).value = noRecordedDataRow
+    
+    
+    # Double check calculations print statements    
+    print ("ISI AX Gaze Cue A Cells: " + str(ISI_AX_A))
+    print ("ISI AX Gaze Probe X Cells: " + str(ISI_AX_X))
+    print ("ISI AX Gaze Probe Non X Cells: " + str(ISI_AX_Non_X))
+    print ("ISI AX Cells Total: " + str(ISI_total_AX))
+    print ("AX Trial Gaze at A to Total AX Trial Ratio Average: " + str(current_Avg_AX_Gaze_ISI_A_Ratio))
+    print ("AX Trial Gaze at X Participant Ratio Average: " + str(current_Avg_AX_Gaze_ISI_X_Ratio))
+    print ("AX Trial Gaze at Non X to Total AX Ratio Average: " + str(current_Avg_AX_Gaze_ISI_Non_X_Ratio))
+    # Double check calculations print statements    
+    print ("ISI AY Gaze Cue A Cells: " + str(ISI_AY_A))
+    print ("ISI AY Gaze Probe Y Cells: " + str(ISI_AY_Y))
+    print ("ISI AY Gaze Probe Non Y Cells: " + str(ISI_AY_Non_Y))
+    print ("ISI AY Cells Total: " + str(ISI_total_AY))
+    print ("AY Trial Gaze at A to Total AY Trial Ratio Average: " + str(current_Avg_AY_Gaze_ISI_A_Ratio))
+    print ("AY Trial Gaze at Y Participant Ratio Average: " + str(current_Avg_AY_Gaze_ISI_Y_Ratio))
+    # Double check calculations print statements    
+    print ("ISI BX Gaze Cue B Cells: " + str(ISI_BX_B))
+    print ("ISI BX Gaze Probe X Cells: " + str(ISI_BX_X))
+    print ("ISI BX Gaze Probe Non X Cells: " + str(ISI_BX_Non_X))
+    print ("ISI BX Cells Total: " + str(ISI_total_BX))
+    print ("BX Trial Gaze at B to Total BX Trial Ratio Average: " + str(current_Avg_BX_Gaze_ISI_B_Ratio))
+    print ("BX Trial Gaze at X Participant Ratio Average: " + str(current_Avg_BX_Gaze_ISI_X_Ratio))
+    # Double check calculations print statements    
+    print ("ISI BY Gaze Cue B Cells: " + str(ISI_BY_B))
+    print ("ISI BY Gaze Probe Y Cells: " + str(ISI_BY_Y))
+    print ("ISI BY Cells Total: " + str(ISI_total_BY))
+    print ("ISI BY Gaze Probe Non Y Cells: " + str(ISI_BY_Non_Y))
+    print ("BY Trial Gaze at B to Total BY Trial Ratio Average: " + str(current_Avg_BY_Gaze_ISI_B_Ratio))
+    print ("BY Trial Gaze at Y Participant Ratio Average: " + str(current_Avg_BY_Gaze_ISI_Y_Ratio))
+    print ("Number of rows with no recorded data: " + str(noRecordedDataRow))
+
+########## 3 second delay condition ####################
+
+participantNumberArray2 = [301, 303, 305, 311, 313, 315, 317, 319, 321, 323, 325, 327, 329, 331, 333, 335, 339, 341, 343, 345, 347, 353, 355, 357, 359, 361, 363, 365, 369, 375, 377, 379, 381, 385]
+
+# Create global variables
+current_Avg_AX_Gaze_ISI_A_Ratio = 0
+current_Avg_AX_Gaze_ISI_X_Ratio = 0
+current_Avg_AY_Gaze_ISI_A_Ratio = 0
+current_Avg_AY_Gaze_ISI_Y_Ratio = 0
+current_Avg_BX_Gaze_ISI_B_Ratio = 0
+current_Avg_BX_Gaze_ISI_X_Ratio = 0
+current_Avg_BY_Gaze_ISI_B_Ratio = 0
+current_Avg_BY_Gaze_ISI_Y_Ratio = 0
+
+# loop through each file in 3 second delay condition
+for o in range (len(participantNumberArray2)):
+    
+    #Create variables and arrays
+    participant = 0
+    stringParticipantNumber2 = ""
+    mr = 0
+    mc = 0
+    mr_copy = 0
+    mr_copy = 0
+    ISI_AX_Non_X = 0
+    ISI_BX_Non_X = 0
+    ISI_AY_Non_Y = 0
+    ISI_BY_Non_Y = 0
+    noRecordedDataRow = 0
+    
+    # AX Trials
+    ISI_total_AX = 0
+    ISI_AX_A = 0
+    ISI_AX_X = 0
+    ISI_AX_Non_X = 0
+      
+    # AY Trials
+    ISI_total_AY = 0
+    ISI_AY_A = 0
+    ISI_AY_Y = 0
+    ISI_AY_Non_Y = 0
+
+    # BX Trials
+    ISI_total_BX = 0
+    ISI_BX_B = 0
+    ISI_BX_X = 0
+    ISI_BX_Non_X = 0
+
+    # BY Trials
+    ISI_total_BY = 0   
+    ISI_BY_B = 0
+    ISI_BY_Y = 0
+    ISI_BY_Non_Y = 0
+    
+    current_Avg_AX_Gaze_ISI_A_Ratio = 0
+    current_Avg_AX_Gaze_ISI_X_Ratio = 0
+    current_Avg_AX_Gaze_ISI_Non_X_Ratio = 0
+    current_Avg_AY_Gaze_ISI_A_Ratio = 0
+    current_Avg_AY_Gaze_ISI_Y_Ratio = 0
+    current_Avg_AY_Gaze_ISI_Non_Y_Ratio = 0
+    current_Avg_BX_Gaze_ISI_B_Ratio = 0
+    current_Avg_BX_Gaze_ISI_X_Ratio = 0
+    current_Avg_BX_Gaze_ISI_Non_X_Ratio = 0
+    current_Avg_BY_Gaze_ISI_B_Ratio = 0
+    current_Avg_BY_Gaze_ISI_Y_Ratio = 0
+    current_Avg_BY_Gaze_ISI_Non_Y_Ratio = 0
+
+    Avg_AX_A_Time = 0
+    Avg_AX_X_Time = 0
+    Avg_AX_Non_X_Time = 0
+    Avg_BX_B_Time = 0
+    Avg_BX_X_Time = 0
+    Avg_BX_Non_X_Time = 0
+    Avg_AY_A_Time = 0
+    Avg_AY_Y_Time = 0
+    Avg_AY_Non_Y_Time = 0
+    Avg_BY_B_Time = 0
+    Avg_BY_Y_Time = 0
+    Avg_BY_Non_Y_Time = 0
+    
+    ISI_total_AX_Time = 0
+    ISI_total_AY_Time = 0
+    ISI_total_BX_Time = 0
+    ISI_total_BY_Time = 0
+    
+    
+    # Create string participant number from Participant Number Array and concatenate into source filename
+    participant = participantNumberArray2[o]
+    stringParticipantNumber2 = str(participant)
+    filename_source3_0 = (filenamepart3_0 + stringParticipantNumber2 + filenamePart3)
+    # Create Instance of Workbook Class and activate sheet on source Excel file
+    wb1 = Workbook()
+    wb1 = openpyxl.load_workbook(filename_source3_0)
+    ws1 = wb1.worksheets[0]
+    ws1 = wb1.active
+    print(filename_source3_0)
+       
+    wbcopy = Workbook()
+    wbcopy = openpyxl.load_workbook(filename_copy)
+    wscopy = wbcopy.worksheets[0]
+    wscopy = wbcopy.active
+    
+    mr = ws1.max_row
+    mc = ws1.max_column
+    
+    # Create variables to identify relevant columns to calculate Cue to Probe ratio analysis
+    columnLeftGazeValidity = 14
+    columnRightGazeValidity = 17
+    columnTrialID = 40
+    columnCue = 41
+    columnTopRightProbeID = 42
+    columnBottomRightProbeID = 43
+    columnAOINumber = 45
+    columnObjectGaze = 46
+    columnAccuracy = 49
+    columnCurrentObject = 52
+    
+    
+      
+    for u in range (1, mr + 1):
+        wscopy.cell(row = u, column = 1).value = ws1.cell(row = u, column = columnTrialID).value       
+        wscopy.cell(row = u, column = 2).value = ws1.cell(row = u, column = columnCue).value
+        wscopy.cell(row = u, column = 3).value = ws1.cell(row = u, column = columnTopRightProbeID).value
+        wscopy.cell(row = u, column = 4).value = ws1.cell(row = u, column = columnBottomRightProbeID).value
+        wscopy.cell(row = u, column = 5).value = ws1.cell(row = u, column = columnAOINumber).value
+        wscopy.cell(row = u, column = 6).value = ws1.cell(row = u, column = columnObjectGaze).value
+        wscopy.cell(row = u, column = 7).value = ws1.cell(row = u, column = columnCurrentObject).value
+        wscopy.cell(row = u, column = 8).value = ws1.cell(row = u, column = columnAccuracy).value
+        wscopy.cell(row = u, column = 9).value = ws1.cell(row = u, column = columnLeftGazeValidity).value
+        wscopy.cell(row = u, column = 10).value = ws1.cell(row = u, column = columnRightGazeValidity).value
+       
+            
+    newColumnTrialID = 1
+    newColumnCue = 2
+    newColumnTopRightProbeID = 3
+    newColumnBottomRightProbeID = 4
+    newColumnAOINumber = 5
+    newColumnObjectGaze = 6
+    newColumnCurrentObject = 7
+    newColumnAccuracy = 8
+    newColumnLeftGazeValidity = 9
+    newColumnRightGazeValidity = 10
+    
+    mr_copy = wscopy.max_row
+    mc_copy = wscopy.max_column
+    count = 0
+    rowPracticeEndNum = 0
+    numWrong = 0
+    
+                
+    # Iterate through all rows of relevant columns
+    for g in range (1, mr+1):
+        count = count + 1
+        if wscopy.cell(row = g, column = newColumnTrialID).value == 10 and wscopy.cell(row = g, column = newColumnCurrentObject).value == "FeedbackDisplay1":
+            rowPracticeEndNum = count
+            break        
+    print("Practice Trial Row Number End: " + str(rowPracticeEndNum))
+    for x in range (rowPracticeEndNum, mr + 1):
+        previousTrial = wscopy.cell(row = (x - 1), column = newColumnTrialID).value
+        thisTrial = wscopy.cell(row = x, column = newColumnTrialID).value
+        wrongAnswerCell = wscopy.cell(row = x, column = newColumnAccuracy).value 
+        ISIColumn = wscopy.cell(row = x, column = newColumnCurrentObject).value
+        objectGaze = wscopy.cell(row = x, column = newColumnObjectGaze).value
+        topRightProbeID = wscopy.cell(row = x, column = newColumnTopRightProbeID).value
+        cueColumn = wscopy.cell(row = x, column = newColumnCue).value
+        aoiNumber = wscopy.cell(row = x, column = newColumnAOINumber).value
+        bottomRightProbeID = wscopy.cell(row = x, column = newColumnBottomRightProbeID).value
+        leftGazeColumn = wscopy.cell(row = x, column = newColumnLeftGazeValidity).value
+        rightGazeColumn = wscopy.cell(row = x, column = newColumnRightGazeValidity).value
+        
+        if (leftGazeColumn != 0 or rightGazeColumn != 0):
+            if (ISIColumn == "ISI"):
+                if (wrongAnswerCell == 1):
+                    # Tally AX Trial ISI gaze on A cue data points for each participant
+                    if objectGaze == "A" and  topRightProbeID == "X":
+                        ISI_AX_A += 1 
+                    # Tally AX ISI gaze on X probe data points for each participant    
+                    if  objectGaze == "X" and  topRightProbeID == "X":
+                        ISI_AX_X += 1
+                    # Tally AX ISI gaze on Non X probe data points for each participant    
+                    if  cueColumn == "A" and  topRightProbeID == "X" and objectGaze is None and aoiNumber is not None:
+                        ISI_AX_Non_X += 1
+                    # Tally AY Trial ISI gaze on A cue data points for each participant
+                    if  objectGaze == "A" and objectGaze is not None and  topRightProbeID is not "X" and  topRightProbeID is not None:
+                        ISI_AY_A += 1 
+                    # Tally AY ISI gaze on Y probe data points for each participant
+                    if  cueColumn == "A" and  topRightProbeID is not "X" and  topRightProbeID is not None and aoiNumber == 1:
+                        ISI_AY_Y += 1 
+                    # Tally AY ISI gaze on Non Y probe data points for each participant    
+                    if  cueColumn == "A" and  topRightProbeID is not "X" and objectGaze is None and aoiNumber is not None:
+                        ISI_AY_Non_Y += 1
+                    # Tally BX Trial ISI gaze on B cue data points for each participant
+                    if  objectGaze != "A" and objectGaze is not None and objectGaze == "B" and bottomRightProbeID == "X" and bottomRightProbeID is not None:
+                        ISI_BX_B += 1 
+                    # Tally BX ISI gaze on X probe data points for each participant    
+                    if  objectGaze == "X" and objectGaze is not None and bottomRightProbeID == "X" and bottomRightProbeID is not None:
+                        ISI_BX_X += 1
+                    # Tally BX ISI gaze on Non X probe data points for each participant    
+                    if  cueColumn is not "A" and bottomRightProbeID == "X" and objectGaze is None and aoiNumber is not None:
+                        ISI_BX_Non_X += 1
+                    # Tally BY Trial ISI gaze on B cue data points for each participant
+                    if  objectGaze == "B" and objectGaze is not None and bottomRightProbeID != "X" and bottomRightProbeID is not None:
+                        ISI_BY_B += 1 
+                    # Tally BY ISI gaze on Y probe data points for each participant    
+                    if  bottomRightProbeID != "X" and aoiNumber == 2:
+                        ISI_BY_Y += 1          
+                    # Tally BY ISI gaze on Non Y probe data points for each participant    
+                    if  cueColumn is not "A" and bottomRightProbeID is not "X" and objectGaze is None and aoiNumber is not None:
+                        ISI_BY_Non_Y += 1
+                    # Tally AX total ISI data points for each participant   
+                    if   topRightProbeID == "X" and cueColumn == "A":
+                        ISI_total_AX += 1
+                    # Tally AY total ISI data points for each participant   
+                    if   topRightProbeID != "X" and cueColumn == "A":
+                        ISI_total_AY += 1
+                    # Tally BX total ISI data points for each participant   
+                    if  bottomRightProbeID == "X" and cueColumn != "A":
+                        ISI_total_BX += 1
+                    # Tally BY total ISI data points for each participant   
+                    if  bottomRightProbeID != "X" and cueColumn != "A":
+                        ISI_total_BY += 1
+                elif (wrongAnswerCell == 0):
+                    if (thisTrial == previousTrial):
+                        continue
+        elif (leftGazeColumn == 0 and rightGazeColumn == 0):
+            noRecordedDataRow += 1
+
+    # perform average calculations by ratio of A cue or X probe gaze to total AX ISI data points    
+    if ISI_total_AX != 0:
+        current_Avg_AX_Gaze_ISI_A_Ratio = ISI_AX_A / ISI_total_AX
+        current_Avg_AX_Gaze_ISI_X_Ratio = ISI_AX_X / ISI_total_AX
+        current_Avg_AX_Gaze_ISI_Non_X_Ratio = ISI_AX_Non_X / ISI_total_AX
+        if ISI_AX_A != 0:
+            Avg_AX_A_Time = (ISI_AX_A -1)* 16.65496782 /1000
+        else:
+            Avg_AX_A_Time = 0
+        if ISI_AX_X != 0:
+            Avg_AX_X_Time = (ISI_AX_X -1)* 16.65496782 /1000
+        else:
+            Avg_AX_X_Time = 0
+        if ISI_AX_Non_X != 0:
+            Avg_AX_Non_X_Time = (ISI_AX_Non_X -1)* 16.65496782 /1000
+        else:
+            Avg_AX_Non_X_Time = 0
+        ISI_total_AX_Time = ISI_total_AX * 16.65496782 /1000
+    # perform average calculations by ratio of A cue or Y probe gaze to total ISI data points and write values to destination file    
+    if ISI_total_AY != 0:
+        current_Avg_AY_Gaze_ISI_A_Ratio = ISI_AY_A / ISI_total_AY
+        current_Avg_AY_Gaze_ISI_Y_Ratio = ISI_AY_Y / ISI_total_AY
+        current_Avg_AY_Gaze_ISI_Non_Y_Ratio = ISI_AY_Non_Y / ISI_total_AY 
+        if ISI_AY_A != 0:
+            Avg_AY_A_Time = (ISI_AY_A -1)* 16.65496782 /1000
+        else:
+            Avg_AY_A_Time = 0
+        if ISI_AY_Y != 0:
+            Avg_AY_Y_Time = (ISI_AY_Y -1)* 16.65496782 /1000
+        else:
+            Avg_AY_Y_Time = 0
+        if ISI_AY_Non_Y != 0:
+            Avg_AY_Non_Y_Time = (ISI_AY_Non_Y -1)* 16.65496782 /1000
+        else:
+            Avg_AY_Non_Y_Time = 0
+        ISI_total_AY_Time = ISI_total_AY * 16.65496782 /1000    
+    # perform average calculations by ratio of B cue or X probe gaze to total BY ISI data points    
+    if ISI_total_BX != 0:
+        current_Avg_BX_Gaze_ISI_B_Ratio = ISI_BX_B / ISI_total_BX
+        current_Avg_BX_Gaze_ISI_X_Ratio = ISI_BX_X / ISI_total_BX
+        current_Avg_BX_Gaze_ISI_Non_X_Ratio = ISI_BX_Non_X / ISI_total_BX
+        if ISI_BX_B != 0:
+            Avg_BX_B_Time = (ISI_BX_B -1)* 16.65496782 /1000
+        else:
+            Avg_BX_B_Time = 0
+        if ISI_BX_X != 0:
+            Avg_BX_X_Time = (ISI_BX_X -1)* 16.65496782 /1000
+        else:
+            Avg_BX_X_Time = 0
+        if ISI_BX_Non_X != 0:
+            Avg_BX_Non_X_Time = (ISI_BX_Non_X -1)* 16.65496782 /1000
+        else:
+            Avg_BX_Non_X_Time = 0
+        ISI_total_BX_Time = ISI_total_BX * 16.65496782 /1000    
+    # perform average calculations by ratio of B cue or Y probe gaze to total BY ISI data points    
+    if ISI_total_BY != 0:
+        current_Avg_BY_Gaze_ISI_B_Ratio = ISI_BY_B / ISI_total_BY
+        current_Avg_BY_Gaze_ISI_Y_Ratio = ISI_BY_Y / ISI_total_BY
+        current_Avg_BY_Gaze_ISI_Non_Y_Ratio = ISI_BY_Non_Y / ISI_total_BY
+        if ISI_BY_B != 0:
+            Avg_BY_B_Time = (ISI_BY_B -1)* 16.65496782 /1000
+        else:
+            Avg_BY_B_Time = 0
+        if ISI_BY_Y != 0:
+            Avg_BY_Y_Time = (ISI_BY_Y -1)* 16.65496782 /1000
+        else:
+            Avg_BY_Y_Time = 0
+        if ISI_BY_Non_Y != 0:
+            Avg_BY_Non_Y_Time = (ISI_BY_Non_Y -1)* 16.65496782 /1000
+        else:
+            Avg_BY_Non_Y_Time = 0
+        ISI_total_BY_Time = ISI_total_BY * 16.65496782 /1000
+      
+  
+    # writing the participant number to destination excel file
+    ws2.cell(row = (o+2), column = 16).value = stringParticipantNumber2
+    ws2.cell(row = (o+2), column = 44).value = stringParticipantNumber2
+    ws2.cell(row = (o+2), column = 64).value = stringParticipantNumber2
+    
+    # writing each Trial Gaze Average to destination excel file
+    ws2.cell(row = o+2, column = 45).value = current_Avg_AX_Gaze_ISI_A_Ratio
+    ws2.cell(row = o+2, column = 17).value = Avg_AX_A_Time 
+    ws2.cell(row = o+2, column = 46).value = current_Avg_AX_Gaze_ISI_X_Ratio
+    ws2.cell(row = o+2, column = 18).value = Avg_AX_X_Time
+    ws2.cell(row = o+2, column = 47).value = current_Avg_AX_Gaze_ISI_Non_X_Ratio
+    ws2.cell(row = o+2, column = 19).value = Avg_AX_Non_X_Time
+    ws2.cell(row = o+2, column = 48).value = current_Avg_AY_Gaze_ISI_A_Ratio
+    ws2.cell(row = o+2, column = 20).value = Avg_AY_A_Time
+    ws2.cell(row = o+2, column = 49).value = current_Avg_AY_Gaze_ISI_Y_Ratio
+    ws2.cell(row = o+2, column = 21).value = Avg_AY_Y_Time
+    ws2.cell(row = o+2, column = 50).value = current_Avg_AY_Gaze_ISI_Non_Y_Ratio
+    ws2.cell(row = o+2, column = 22).value = Avg_AY_Non_Y_Time
+    ws2.cell(row = o+2, column = 51).value = current_Avg_BX_Gaze_ISI_B_Ratio
+    ws2.cell(row = o+2, column = 23).value = Avg_BX_B_Time
+    ws2.cell(row = o+2, column = 52).value = current_Avg_BX_Gaze_ISI_X_Ratio
+    ws2.cell(row = o+2, column = 24).value = Avg_BX_X_Time
+    ws2.cell(row = o+2, column = 53).value = current_Avg_BX_Gaze_ISI_Non_X_Ratio
+    ws2.cell(row = o+2, column = 25).value = Avg_BX_Non_X_Time
+    ws2.cell(row = o+2, column = 54).value = current_Avg_BY_Gaze_ISI_B_Ratio
+    ws2.cell(row = o+2, column = 26).value = Avg_BY_B_Time
+    ws2.cell(row = o+2, column = 55).value = current_Avg_BY_Gaze_ISI_Y_Ratio
+    ws2.cell(row = o+2, column = 27).value = Avg_BY_Y_Time
+    ws2.cell(row = o+2, column = 56).value = current_Avg_BY_Gaze_ISI_Non_Y_Ratio
+    ws2.cell(row = o+2, column = 28).value = Avg_BY_Non_Y_Time
+    
+    ws2.cell(row = o+2, column = 65).value = ISI_total_AX_Time
+    ws2.cell(row = o+2, column = 66).value = ISI_total_AY_Time
+    ws2.cell(row = o+2, column = 67).value = ISI_total_BX_Time
+    ws2.cell(row = o+2, column = 68).value = ISI_total_BY_Time
+    
+    ws2.cell(row = o+2, column = 72).value = noRecordedDataRow
+    
+    
+    # Double check calculations print statements    
+    print ("ISI AX Gaze Cue A Cells: " + str(ISI_AX_A))
+    print ("ISI AX Gaze Probe X Cells: " + str(ISI_AX_X))
+    print ("ISI AX Gaze Probe Non X Cells: " + str(ISI_AX_Non_X))
+    print ("ISI AX Cells Total: " + str(ISI_total_AX))
+    print ("AX Trial Gaze at A to Total AX Trial Ratio Average: " + str(current_Avg_AX_Gaze_ISI_A_Ratio))
+    print ("AX Trial Gaze at X Participant Ratio Average: " + str(current_Avg_AX_Gaze_ISI_X_Ratio))
+    print ("AX Trial Gaze at Non X to Total AX Ratio Average: " + str(current_Avg_AX_Gaze_ISI_Non_X_Ratio))
+    # Double check calculations print statements    
+    print ("ISI AY Gaze Cue A Cells: " + str(ISI_AY_A))
+    print ("ISI AY Gaze Probe Y Cells: " + str(ISI_AY_Y))
+    print ("ISI AY Gaze Probe Non Y Cells: " + str(ISI_AY_Non_Y))
+    print ("ISI AY Cells Total: " + str(ISI_total_AY))
+    print ("AY Trial Gaze at A to Total AY Trial Ratio Average: " + str(current_Avg_AY_Gaze_ISI_A_Ratio))
+    print ("AY Trial Gaze at Y Participant Ratio Average: " + str(current_Avg_AY_Gaze_ISI_Y_Ratio))
+    # Double check calculations print statements    
+    print ("ISI BX Gaze Cue B Cells: " + str(ISI_BX_B))
+    print ("ISI BX Gaze Probe X Cells: " + str(ISI_BX_X))
+    print ("ISI BX Gaze Probe Non X Cells: " + str(ISI_BX_Non_X))
+    print ("ISI BX Cells Total: " + str(ISI_total_BX))
+    print ("BX Trial Gaze at B to Total BX Trial Ratio Average: " + str(current_Avg_BX_Gaze_ISI_B_Ratio))
+    print ("BX Trial Gaze at X Participant Ratio Average: " + str(current_Avg_BX_Gaze_ISI_X_Ratio))
+    # Double check calculations print statements    
+    print ("ISI BY Gaze Cue B Cells: " + str(ISI_BY_B))
+    print ("ISI BY Gaze Probe Y Cells: " + str(ISI_BY_Y))
+    print ("ISI BY Cells Total: " + str(ISI_total_BY))
+    print ("ISI BY Gaze Probe Non Y Cells: " + str(ISI_BY_Non_Y))
+    print ("BY Trial Gaze at B to Total BY Trial Ratio Average: " + str(current_Avg_BY_Gaze_ISI_B_Ratio))
+    print ("BY Trial Gaze at Y Participant Ratio Average: " + str(current_Avg_BY_Gaze_ISI_Y_Ratio))
+    print ("Number of rows with no recorded data: " + str(noRecordedDataRow))
+    
+# saving the destination excel file 
+wbcopy.save(filename_copy) 
+# save destination file
+wb2.save(filename_destination)
